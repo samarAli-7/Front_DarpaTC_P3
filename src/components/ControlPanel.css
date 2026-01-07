@@ -181,23 +181,32 @@
 /* =========================
    ACTIVE UAV MODE (FIXED)
 ========================= */
+/* =========================
+   ACTIVE UAV MODE (FIXED)
+========================= */
 
 .control-panel.active {
   display: grid;
+
+  /* ⬅️ tighten the grid so right-side buttons stay inside */
   grid-template-columns:
     auto
     auto
-    minmax(220px, 1fr)
-    minmax(220px, 1fr)
-    auto;
+    minmax(200px, 1fr)
+    minmax(200px, 1fr)
+    max-content;
 
-  column-gap: 24px;
+  column-gap: 0px;
+
+
   align-items: center;
 
-  /* restore breathing room */
+  /* ⬅️ reduce right padding */
+  padding: 18px 12px 18px 20px;
   min-height: 170px;
-  padding: 18px 28px;
-  grid-auto-rows: minmax(36px, auto);
+
+  box-sizing: border-box;
+  overflow: hidden;
 
   border-color: var(--uavColor);
   box-shadow:
@@ -293,4 +302,15 @@
   background: transparent;
   border-color: rgba(255,255,255,0.35);
   white-space: nowrap;
+}
+
+.mode-set-btn {
+  margin-right: 16px;
+}
+
+/* Smaller LOAD GEOFENCE button */
+.action-btn.load-geofence {
+  min-width: 130px;
+  padding: 10px 16px;
+  font-size: 11px;
 }

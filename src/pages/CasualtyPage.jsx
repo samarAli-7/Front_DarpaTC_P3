@@ -9,47 +9,48 @@ import ControlPanel from "../components/ControlPanel";
 
 import "./CasualtyPage.css";
 
-export default function CasualtyPage() {
-  /* ================= CASUALTY UI ================= */
+export default function CasualtyPage({
+  globalGeofence,
+  setGlobalGeofence,
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const [triageFilter, setTriageFilter] = useState("all");
   const [focusedId, setFocusedId] = useState(null);
 
-  /* ================= UAV UI ================= */
   const [uavCollapsed, setUavCollapsed] = useState(false);
   const [hoveredUavId, setHoveredUavId] = useState(null);
   const [lockedUavId, setLockedUavId] = useState(null);
 
-  const hoveredUav =
-    uavs.find((u) => u.id === hoveredUavId) || null;
-
-  const lockedUav =
-    uavs.find((u) => u.id === lockedUavId) || null;
-
+  const hoveredUav = uavs.find((u) => u.id === hoveredUavId) || null;
+  const lockedUav = uavs.find((u) => u.id === lockedUavId) || null;
   const activeUav = lockedUav || hoveredUav;
 
-  /* 🔥 RESET TO GLOBAL MODE */
   const clearUavSelection = () => {
     setLockedUavId(null);
     setHoveredUavId(null);
   };
 
+  const [uavGeofences, setUavGeofences] = useState({});
+
+  const applyUavGeofence = (uavId, points) => {
+    setUavGeofences((prev) => ({ ...prev, [uavId]: points }));
+  };
+
   return (
     <div className="casualty-page">
-      {/* ================= MAP ================= */}
       <div className="map-layer">
         <CasualtyMap
           casualties={casualties}
-          focusedId={focusedId}
           triageFilter={triageFilter}
+          focusedId={focusedId}
           uavs={uavs}
           focusedUavId={activeUav?.id || null}
+          globalGeofence={globalGeofence}
+          uavGeofences={uavGeofences}
         />
       </div>
 
-      {/* ================= UI ================= */}
       <div className="ui-layer">
-        {/* UAV DRAWER */}
         <UavDrawer
           uavs={uavs}
           collapsed={uavCollapsed}
@@ -60,15 +61,12 @@ export default function CasualtyPage() {
           setLockedUavId={setLockedUavId}
         />
 
-        {/* RIGHT CASUALTY UI */}
         <div className={`right-ui ${collapsed ? "collapsed" : ""}`}>
           <div className="triage-filters">
             {["red", "yellow", "green", "black", "all"].map((t) => (
               <button
                 key={t}
-                className={`filter-btn ${
-                  triageFilter === t ? "active" : ""
-                }`}
+                className={`filter-btn ${triageFilter === t ? "active" : ""}`}
                 onClick={() => setTriageFilter(t)}
               >
                 {t.toUpperCase()}
@@ -88,8 +86,7 @@ export default function CasualtyPage() {
               {casualties
                 .filter(
                   (c) =>
-                    triageFilter === "all" ||
-                    c.triage === triageFilter
+                    triageFilter === "all" || c.triage === triageFilter
                 )
                 .map((c) => (
                   <button
@@ -107,12 +104,13 @@ export default function CasualtyPage() {
           </div>
         </div>
 
-        {/* ================= CONTROL PANEL ================= */}
         <div className="bottom-safe-area">
           <ControlPanel
             uavs={uavs}
             activeUav={activeUav}
             onClearSelection={clearUavSelection}
+            onApplyGlobalGeofence={setGlobalGeofence}
+            onApplyUavGeofence={applyUavGeofence}
           />
         </div>
       </div>
